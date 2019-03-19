@@ -1,0 +1,107 @@
+1.
+[K,map]= imread('C:\Users\ywj5022\Desktop\image\citywall.bmp'); 
+map(end:255,:)=0; 
+subplot(4,4,1); 
+K1=ind2gray(K,map); 
+imhist(K1);
+title('citywall直方图');
+
+2.
+[H,map]= imread('C:\Users\ywj5022\Desktop\image\citywall.bmp'); 
+map(end:255,:)=0; 
+subplot(2,2,1); 
+H=ind2gray(H,map); 
+subplot(2,2,1); 
+imshow(H,[0,255]); 
+title('citywall原图');
+
+[m,n]=size(H); 
+p=zeros(1,256); 
+for i=0:255 
+p(i+1)=length(find(H==i))/(m*n); 
+end
+
+subplot(2,2,2); 
+bar(0:255,p,'b'); 
+title('原图直方图');
+
+s=zeros(1,256); 
+for i=1:256 
+for j=1:i 
+s(i)=p(j)+s(i); 
+end 
+end
+
+a=round(s*255); 
+b=H; 
+for i=0:255 
+b(find(H==i))=a(i+1); 
+end 
+subplot(2,2,3); 
+imshow(b) 
+title('均衡化图像');
+
+for i=0:255 
+GPeq(i+1)=sum(p(find(a==i))); 
+end 
+subplot(2,2,4); 
+bar(0:255,GPeq,'b'); title('均衡化图像直方图');
+
+3.
+[b,map] = imread('C:\Users\ywj5022\Desktop\image\citywall1.bmp'); 
+map(end:255,:)=0; 
+b1=ind2gray(b,map);
+
+[b1,map] = imread('C:\Users\ywj5022\Desktop\image\citywall.bmp'); 
+map(end:255,:)=0; 
+b2=ind2gray(b1,map);
+
+hist3 = imhist(b2); 
+match11 = histeq(b1, hist3);
+
+figure; 
+subplot(2, 3, 1), imshow(b1), title('原图像'); 
+subplot(2, 3, 2), imshow(b2), title('模板图像'); 
+subplot(2, 3, 3), imshow(match1), title('匹配后得到的图像'); 
+subplot(2, 3, 4), imhist(b1), title('原图像的直方图'); 
+subplot(2, 3, 5), imhist(b2), title('模板图像的直方图'); 
+subplot(2, 3, 6), imhist(match1), title('匹配后的直方图');
+
+4.
+img=imread('C:\Users\ywj5022\Desktop\image\lena.bmp'); 
+figure,imshow(img); 
+title('原始图像'); 
+%构建模板 
+n=7; 
+model(1:n,1:n)=1;%a为n*n大小的模板，像素值为1 
+imgTend=wextend('2D','sym',img,n); 
+tendTrans=double(imgTend);%变成double型便于后期的点乘计算 
+[row,col]=size(imgTend);%获取扩展后的图像的大小 
+tendTransTmp=tendTrans; 
+for i=n+1:row-n 
+for j=n+1:col-n 
+modelResult=tendTrans(i:i+(n-1),j:j+(n-1));
+modelEpual=histeq(uint8(modelResult)); 
+equalTmp=double(modelEpual); 
+tendTransTmp(i,j)=equalTmp(4,4);%将均衡后的中心点的像素值赋给原图对应点的元素 
+end 
+end 
+%未被赋值的元素取原值 
+result=tendTransTmp(n+1:row-n,n+1:col-n);%均衡化后取原图像大小 
+result=uint8(result); 
+%d=uint8(x2); 
+figure,imshow(result); 
+title('增强后图像');
+
+5.close all 
+clc 
+clear 
+function OTSU(imgpath)%最大类间方差法分割图像
+[A,map]=imread('C:\Users\ywj5022\Desktop\image\elain.bmp');
+A_gray=ind2gray(A,map);
+level=graythresh(A);
+B=im2bw(A,level);
+figure;
+subplot(1,2,1),imshow(A);title('原图');
+subplot(1,2,2),imshow(B);title('分割后图像');
+end
